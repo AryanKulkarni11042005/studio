@@ -1,9 +1,12 @@
+
 "use server";
 
 import clientPromise from "@/lib/db";
 import type { GuestFormValues } from "@/components/guest-form";
 import type { Collection, ObjectId } from 'mongodb';
 import { revalidatePath } from 'next/cache';
+import { suggestGroupArrangements } from "@/ai/flows/suggest-group-arrangements";
+import type { SuggestGroupArrangementsInput, SuggestGroupArrangementsOutput } from "@/ai/flows/suggest-group-arrangements";
 
 // Define the structure of a Guest document in the database
 export interface Guest extends GuestFormValues {
@@ -65,5 +68,20 @@ export async function deleteGuest(guestId: string): Promise<void> {
         throw new Error("Invalid guest ID format.");
     }
     throw new Error("Failed to delete guest from the database.");
+  }
+}
+
+// Action to get group arrangement suggestion using Genkit flow
+export async function getGroupArrangementSuggestion(
+  input: SuggestGroupArrangementsInput
+): Promise<SuggestGroupArrangementsOutput> {
+  try {
+    // The 'suggestGroupArrangements' function is already marked with 'use server'
+    // implicitly via its file, but calling it from here ensures it runs server-side.
+    const result = await suggestGroupArrangements(input);
+    return result;
+  } catch (error) {
+    console.error("Error getting group arrangement suggestion:", error);
+    throw new Error("Failed to get suggestion from the AI model.");
   }
 }
