@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Kulkarni Wedding',
+  title: 'Pinakin-Vaidehi Wedding',
   description: 'Easily manage your event invitation list.',
 };
 
