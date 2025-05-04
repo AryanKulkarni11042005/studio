@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { addGuest } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
   familyName: z.string().min(2, {
@@ -25,13 +27,13 @@ const formSchema = z.object({
   numberOfMembers: z.coerce.number().min(1, {
     message: "Number of members must be at least 1.",
   }),
-  placeOfVisit: z.string().min(2, {
-    message: "Place of visit must be at least 2 characters.",
+  placeOfVisit: z.enum(["Pune", "Indore", "Pune-Indore"], {
+    message: "Please select a place of visit.",
   }),
   aaherAmount: z.coerce.number().min(0, {
     message: "Aaher amount must be a positive number.",
   }),
-  phoneNumber: z.string().optional(), // Adding optional phone number field
+  phoneNumber: z.string().optional(), // Optional phone number field
 });
 
 export type GuestFormValues = z.infer<typeof formSchema>;
@@ -45,9 +47,9 @@ export function GuestForm() {
     defaultValues: {
       familyName: "",
       numberOfMembers: 1,
-      placeOfVisit: "",
+      placeOfVisit: "Pune", // Default option
       aaherAmount: 0,
-      phoneNumber: "", // Add default value for phone number
+      phoneNumber: "",
     },
   });
 
@@ -83,7 +85,7 @@ export function GuestForm() {
             <FormItem>
               <FormLabel>Family Name</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., The Kulkarnis" {...field} />
+                <Input placeholder="e.g., Sharma Family" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,7 +98,7 @@ export function GuestForm() {
             <FormItem>
               <FormLabel>Number of Members</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="e.g., 4" {...field} />
+                <Input type="number" min="1" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -106,10 +108,27 @@ export function GuestForm() {
           control={form.control}
           name="placeOfVisit"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-3">
               <FormLabel>Place of Visit</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Wedding Venue" {...field} />
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex flex-col space-y-1"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Pune" id="pune" />
+                    <Label htmlFor="pune" className="text-[#424C55]">Pune</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Indore" id="indore" />
+                    <Label htmlFor="indore" className="text-[#424C55]">Indore</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Pune-Indore" id="pune-indore" />
+                    <Label htmlFor="pune-indore" className="text-[#424C55]">Pune-Indore</Label>
+                  </div>
+                </RadioGroup>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,7 +141,7 @@ export function GuestForm() {
             <FormItem>
               <FormLabel>Aaher Amount (₹)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="e.g., 501" {...field} />
+                <Input type="number" min="0" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -144,10 +163,16 @@ export function GuestForm() {
         <Button 
           type="submit" 
           className="w-full bg-[#886F68] hover:bg-[#3D2C2E] text-white" 
-          disabled={isSubmitting}
+          disabled={form.formState.isSubmitting}
         >
-          {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          {isSubmitting ? "Adding..." : "Add Family"}
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Adding...
+            </>
+          ) : (
+            "Add Family"
+          )}
         </Button>
       </form>
     </Form>
