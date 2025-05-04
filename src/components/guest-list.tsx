@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function GuestList() {
   const [guests, setGuests] = React.useState<Guest[]>([]);
@@ -78,6 +79,13 @@ export function GuestList() {
     }
   };
 
+  // Calculate summary statistics
+  const totalMembers = React.useMemo(() => {
+    return guests.reduce((sum, guest) => sum + guest.numberOfMembers, 0);
+  }, [guests]);
+  
+  const totalFamilies = guests.length;
+  
   if (loading) {
     return <div className="flex justify-center items-center h-20"><Loader2 className="h-8 w-8 animate-spin text-[#886F68]" /></div>;
   }
@@ -87,73 +95,91 @@ export function GuestList() {
   }
 
   return (
-    <div className="w-full overflow-auto">
-      <Table className="border-collapse">
-        <TableHeader className="bg-[#D1CCDC]">
-          <TableRow>
-            <TableHead className="text-[#3D2C2E] font-bold">Family Name</TableHead>
-            <TableHead className="text-[#3D2C2E] font-bold">Members</TableHead>
-            <TableHead className="text-[#3D2C2E] font-bold">Visit</TableHead>
-            <TableHead className="text-[#3D2C2E] font-bold">Aaher</TableHead>
-            <TableHead className="text-[#3D2C2E] font-bold">Phone</TableHead>
-            <TableHead className="text-right text-[#3D2C2E] font-bold">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {guests.map((guest) => {
-            const guestIdStr = guest._id!.toString();
-            return (
-              <TableRow 
-                key={guestIdStr} 
-                className="border-b border-[#886F68]/20 hover:bg-[#F5EDF0]/80"
-              >
-                <TableCell className="font-medium text-[#3D2C2E]">{guest.familyName}</TableCell>
-                <TableCell className="text-[#424C55]">{guest.numberOfMembers}</TableCell>
-                <TableCell className="text-[#424C55]">{guest.placeOfVisit}</TableCell>
-                <TableCell className="text-[#424C55]">₹{guest.aaherAmount.toLocaleString('en-IN')}</TableCell>
-                <TableCell className="text-[#424C55]">{guest.phoneNumber || "-"}</TableCell>
-                <TableCell className="text-right">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-[#3D2C2E] hover:bg-[#886F68]/20"
-                        disabled={deletingGuestId === guestIdStr}
-                      >
-                        {deletingGuestId === guestIdStr ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4 text-[#886F68]" />
-                        )}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the
-                          entry for the {guest.familyName} family.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(guestIdStr)}
-                          className="bg-destructive hover:bg-destructive/90"
+    <div className="space-y-4">
+      <div className="w-full overflow-auto">
+        <Table className="border-collapse">
+          <TableHeader className="bg-[#D1CCDC]">
+            <TableRow>
+              <TableHead className="text-[#3D2C2E] font-bold">Family Name</TableHead>
+              <TableHead className="text-[#3D2C2E] font-bold">Members</TableHead>
+              <TableHead className="text-[#3D2C2E] font-bold">Visit</TableHead>
+              <TableHead className="text-[#3D2C2E] font-bold">Aaher</TableHead>
+              <TableHead className="text-[#3D2C2E] font-bold">Phone</TableHead>
+              <TableHead className="text-right text-[#3D2C2E] font-bold">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {guests.map((guest) => {
+              const guestIdStr = guest._id!.toString();
+              return (
+                <TableRow 
+                  key={guestIdStr} 
+                  className="border-b border-[#886F68]/20 hover:bg-[#F5EDF0]/80"
+                >
+                  <TableCell className="font-medium text-[#3D2C2E]">{guest.familyName}</TableCell>
+                  <TableCell className="text-[#424C55]">{guest.numberOfMembers}</TableCell>
+                  <TableCell className="text-[#424C55]">{guest.placeOfVisit}</TableCell>
+                  <TableCell className="text-[#424C55]">₹{guest.aaherAmount.toLocaleString('en-IN')}</TableCell>
+                  <TableCell className="text-[#424C55]">{guest.phoneNumber || "-"}</TableCell>
+                  <TableCell className="text-right">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-[#3D2C2E] hover:bg-[#886F68]/20"
                           disabled={deletingGuestId === guestIdStr}
                         >
-                          {deletingGuestId === guestIdStr ? 'Deleting...' : 'Delete'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                          {deletingGuestId === guestIdStr ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4 text-[#886F68]" />
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the
+                            entry for the {guest.familyName} family.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(guestIdStr)}
+                            className="bg-destructive hover:bg-destructive/90"
+                            disabled={deletingGuestId === guestIdStr}
+                          >
+                            {deletingGuestId === guestIdStr ? 'Deleting...' : 'Delete'}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+      
+      {/* Summary Card */}
+      <Card className="bg-[#D1CCDC] border-[#886F68] shadow-sm">
+        <CardContent className="flex justify-between items-center p-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-[#3D2C2E]" />
+            <span className="text-[#3D2C2E] font-medium">Total Members:</span>
+            <span className="text-[#3D2C2E] font-bold text-lg">{totalMembers}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[#424C55]">across</span>
+            <span className="text-[#3D2C2E] font-bold">{totalFamilies}</span>
+            <span className="text-[#424C55]">{totalFamilies === 1 ? 'family' : 'families'}</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
