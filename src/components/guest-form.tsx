@@ -28,9 +28,10 @@ const formSchema = z.object({
   placeOfVisit: z.string().min(2, {
     message: "Place of visit must be at least 2 characters.",
   }),
-  aaherAmount: z.coerce.number().min(0, { // Allows 0 amount
-    message: "Aaher amount cannot be negative.",
+  aaherAmount: z.coerce.number().min(0, {
+    message: "Aaher amount must be a positive number.",
   }),
+  phoneNumber: z.string().optional(), // Adding optional phone number field
 });
 
 export type GuestFormValues = z.infer<typeof formSchema>;
@@ -46,6 +47,7 @@ export function GuestForm() {
       numberOfMembers: 1,
       placeOfVisit: "",
       aaherAmount: 0,
+      phoneNumber: "", // Add default value for phone number
     },
   });
 
@@ -81,7 +83,7 @@ export function GuestForm() {
             <FormItem>
               <FormLabel>Family Name</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., The Smiths" {...field} />
+                <Input placeholder="e.g., The Kulkarnis" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,7 +128,24 @@ export function GuestForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone Number (Optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., +91 9876543210" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button 
+          type="submit" 
+          className="w-full bg-[#886F68] hover:bg-[#3D2C2E] text-white" 
+          disabled={isSubmitting}
+        >
           {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           {isSubmitting ? "Adding..." : "Add Family"}
         </Button>
