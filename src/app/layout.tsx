@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'GuestEase - Invitation List Maker',
+  title: 'Kulkarni Wedding',
   description: 'Easily manage your event invitation list.',
 };
 

@@ -15,6 +15,7 @@ export type Guest = {
   placeOfVisit: string;
   aaherAmount: number;
   phoneNumber?: string; // Optional phone number
+  createdAt?: Date; // Optional creation date
 };
 
 // Helper function to get the guests collection
